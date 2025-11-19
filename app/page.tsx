@@ -70,6 +70,12 @@ export default function Home() {
 
   return (
     <main className="bg-black min-h-screen text-white overflow-x-hidden selection:bg-red-600 selection:text-black">
+      {/* HEADER / NAV */}
+      <nav className="fixed top-0 w-full p-6 flex justify-between items-center z-50 mix-blend-difference">
+        <div className="text-xl font-mono font-bold tracking-wider">REDPILL.AI</div>
+        <WalletMultiButton className="!bg-transparent !border !border-red-600 !px-6 !py-2 hover:!bg-red-600 hover:!text-black !transition-all !font-mono !text-sm" />
+      </nav>
+
       {/* HERO SECTION */}
       <section className="h-screen flex flex-col items-center justify-center relative">
         <div className="absolute inset-0 z-0">
