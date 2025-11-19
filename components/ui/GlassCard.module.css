@@ -1,0 +1,78 @@
+.card {
+  position: relative;
+  padding: 2rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Variants */
+.default {
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.elevated {
+  background: rgba(15, 15, 15, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+.glow {
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glow-color, rgba(220, 38, 38, 0.3));
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+}
+
+.glow:hover {
+  border-color: var(--glow-color, rgba(220, 38, 38, 0.5));
+  box-shadow:
+    0 0 30px rgba(220, 38, 38, 0.4),
+    0 0 60px rgba(220, 38, 38, 0.2);
+}
+
+.bordered {
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 2px solid rgba(220, 38, 38, 0.5);
+}
+
+/* Blur levels */
+.sm {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+.md {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.lg {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+/* Fallback for browsers without backdrop-filter */
+@supports not (backdrop-filter: blur(16px)) {
+  .card {
+    background: rgba(10, 10, 10, 0.95);
+  }
+
+  .elevated {
+    background: rgba(15, 15, 15, 0.95);
+  }
+
+  .bordered {
+    background: rgba(10, 10, 10, 0.9);
+  }
+}
