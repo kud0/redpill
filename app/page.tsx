@@ -3,20 +3,10 @@
 import { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import dynamic from 'next/dynamic';
+import TheRedPill from '@/components/TheRedPill';
 import GlitchText from '@/components/GlitchText';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Dynamically import 3D component to prevent SSR issues
-const TheRedPill = dynamic(() => import('@/components/TheRedPill'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[600px] flex items-center justify-center bg-black">
-      <div className="text-red-500 font-mono animate-pulse">LOADING...</div>
-    </div>
-  ),
-});
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
