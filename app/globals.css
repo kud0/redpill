@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -32,7 +34,8 @@
     border-color: hsl(var(--border));
   }
   body {
-    @apply bg-dark-500 text-white;
+    @apply bg-black text-white;
+    font-family: 'Space Mono', monospace;
     font-feature-settings: "rlig" 1, "calt" 1;
     /* Improve text rendering on mobile */
     -webkit-font-smoothing: antialiased;

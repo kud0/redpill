@@ -1,314 +1,241 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import BalanceChecker from '@/components/balance-checker';
-import Link from 'next/link';
-import ParticleField from '@/components/backgrounds/ParticleField';
-import GradientMesh from '@/components/backgrounds/GradientMesh';
-import DepthLayer from '@/components/backgrounds/DepthLayer';
-import ScrollReveal, { StaggerContainer, StaggerItem } from '@/components/effects/ScrollReveal';
-import GlassCard from '@/components/ui/GlassCard';
-import PremiumButton from '@/components/ui/PremiumButton';
-import MemeIcon from '@/components/icons/MemeIcon';
-import ImageIcon from '@/components/icons/ImageIcon';
-import ThreadIcon from '@/components/icons/ThreadIcon';
-import VoiceIcon from '@/components/icons/VoiceIcon';
-import VocalRemoverIcon from '@/components/icons/VocalRemoverIcon';
-import RedPillLogo from '@/components/icons/RedPillLogo';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import HeroScene from '@/components/HeroScene';
+import GlitchText from '@/components/GlitchText';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const features = [
   {
-    name: 'Meme Generator',
-    description: 'Create viral memes with AI-powered templates and trending formats',
-    Icon: MemeIcon,
-    href: '/meme-generator',
-    tier: 'Basic',
+    title: 'MEME_GENERATOR',
+    desc: 'Inject viral mimetic viruses.',
+    href: '/meme-generator'
   },
   {
-    name: 'Image Generator',
-    description: 'Generate stunning images with Flux.1 Pro and SD3 Medium',
-    Icon: ImageIcon,
-    href: '/image-generator',
-    tier: 'Full',
+    title: 'VOICE_CLONER',
+    desc: 'Steal any identity in 10 seconds.',
+    href: '/voice-cloner'
   },
   {
-    name: 'Thread Writer',
-    description: 'Write engaging threads for X, Warpcast, and Lens Protocol',
-    Icon: ThreadIcon,
-    href: '/thread-writer',
-    tier: 'Basic',
+    title: 'GOD_MODE',
+    desc: 'Uncensored AI access.',
+    href: '/image-generator'
   },
   {
-    name: 'Voice Cloner',
-    description: 'Clone any voice with just 10 seconds of audio',
-    Icon: VoiceIcon,
-    href: '/voice-cloner',
-    tier: 'Full',
+    title: 'THREAD_WRITER',
+    desc: 'Weaponized social engineering.',
+    href: '/thread-writer'
   },
   {
-    name: 'Vocal Remover',
-    description: 'Split audio into stems: vocals, instrumental, drums, bass',
-    Icon: VocalRemoverIcon,
-    href: '/vocal-remover',
-    tier: 'Full',
-  },
-];
-
-const tiers = [
-  {
-    name: 'Basic',
-    tokens: '500K',
-    price: '$REDPILL',
-    features: ['Image Generation (SD3)', 'Thread Writer', 'Meme Generator'],
-    color: 'blue',
+    title: 'VOCAL_REMOVER',
+    desc: 'Audio manipulation matrix.',
+    href: '/vocal-remover'
   },
   {
-    name: 'Full Access',
-    tokens: '2M',
-    price: '$REDPILL',
-    features: ['All Basic Features', 'Flux.1 Pro', 'Voice Cloner', 'Vocal Remover'],
-    color: 'purple',
-  },
-  {
-    name: 'God Mode',
-    tokens: '10M',
-    price: '$REDPILL',
-    features: ['All Features', 'Priority Processing', 'Unlimited Requests', 'Early Access'],
-    color: 'red',
+    title: 'IMAGE_GEN',
+    desc: 'Reality synthesis engine.',
+    href: '/image-generator'
   },
 ];
 
 export default function Home() {
   const { connected } = useWallet();
 
+  useEffect(() => {
+    // Animate sections fading in on scroll
+    const sections = document.querySelectorAll('.reveal-section');
+    sections.forEach(section => {
+      gsap.fromTo(
+        section,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 80%',
+          },
+        }
+      );
+    });
+  }, []);
+
   return (
-    <div className="relative">
-      {/* Background Effects - Multi-layered depth system */}
-      <div className="fixed inset-0 -z-10">
-        <DepthLayer />
-        <GradientMesh />
-        <ParticleField />
-      </div>
+    <main className="bg-black min-h-screen text-white overflow-x-hidden selection:bg-red-600 selection:text-black">
+      {/* HEADER / NAV */}
+      <nav className="fixed top-0 w-full p-6 flex justify-between items-center z-50 mix-blend-difference">
+        <div className="text-xl font-mono font-bold tracking-wider">REDPILL.AI</div>
+        <WalletMultiButton className="!bg-transparent !border !border-red-600 !px-6 !py-2 hover:!bg-red-600 hover:!text-black !transition-all !font-mono !text-sm" />
+      </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* Hero Section */}
-        <div className="relative text-center mb-12 sm:mb-16 min-h-[70vh] sm:min-h-[80vh] flex flex-col items-center justify-center px-4">
-          <ScrollReveal animation="scale" duration={0.8}>
-            <div className="inline-block mb-6 sm:mb-8">
-              <RedPillLogo size="xl" variant="default" animated={true} glow={true} />
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal animation="fade" delay={0.2} duration={0.8}>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 leading-tight tracking-tight">
-              <span className="inline-block text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.5)] hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.8)] transition-all duration-300">
-                Take the
-              </span>{' '}
-              <span className="inline-block relative">
-                <span className="absolute inset-0 blur-2xl bg-gradient-to-r from-redpill-400 via-redpill-500 to-redpill-600 opacity-50 animate-pulse" />
-                <span className="relative bg-gradient-to-r from-redpill-400 via-redpill-500 to-redpill-600 text-transparent bg-clip-text animate-gradient bg-300% drop-shadow-[0_0_30px_rgba(220,38,38,0.8)] font-black tracking-tighter">
-                  Red Pill
-                </span>
-              </span>
-            </h1>
-          </ScrollReveal>
-
-          <ScrollReveal animation="fade" delay={0.4} duration={0.8}>
-            <GlassCard className="max-w-3xl mx-auto p-6 sm:p-8 mb-6 sm:mb-8">
-              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 leading-relaxed">
-                Hold $REDPILL tokens to unlock unlimited access to premium AI tools.
-                No subscriptions. No limits. Just pure utility.
-              </p>
-            </GlassCard>
-          </ScrollReveal>
-
-          {!connected ? (
-            <ScrollReveal animation="slide" direction="up" delay={0.6}>
-              <div className="text-redpill-400 font-semibold text-base sm:text-lg mb-6 sm:mb-8 px-4">
-                Connect your wallet to get started
-              </div>
-            </ScrollReveal>
-          ) : (
-            <ScrollReveal animation="slide" direction="up" delay={0.6}>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full sm:w-auto px-4">
-                <PremiumButton variant="gradient" size="lg" glow className="w-full sm:w-auto">
-                  Explore Tools
-                </PremiumButton>
-                <PremiumButton variant="ghost" size="lg" className="w-full sm:w-auto">
-                  Learn More
-                </PremiumButton>
-              </div>
-            </ScrollReveal>
-          )}
+      {/* HERO SECTION */}
+      <section className="h-screen flex flex-col items-center justify-center relative">
+        <div className="absolute inset-0 z-0">
+          <HeroScene />
         </div>
 
-      {/* Balance Checker */}
-      {connected && (
-        <div className="max-w-2xl mx-auto mb-16">
-          <BalanceChecker />
+        <div className="z-10 text-center pointer-events-none px-4">
+          <p className="text-red-500 font-mono mb-4 tracking-widest animate-pulse">
+            THE MATRIX IS REAL
+          </p>
+          <GlitchText text="WAKE UP NEO" />
+          <p className="mt-6 max-w-md mx-auto text-gray-400 font-mono text-sm leading-relaxed">
+            Hold $REDPILL. Break the simulation. Access forbidden AI tools.
+          </p>
         </div>
-      )}
 
-      {/* Features Grid */}
-      <div className="mb-12 sm:mb-16">
-        <ScrollReveal animation="fade">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-8 sm:mb-12 text-center px-4">
-            Premium AI Tools
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+          <div className="flex flex-col items-center gap-2 animate-bounce">
+            <span className="text-red-500 font-mono text-xs tracking-widest">SCROLL</span>
+            <div className="w-px h-12 bg-gradient-to-b from-red-500 to-transparent"></div>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES SECTION */}
+      <section className="py-24 px-4 reveal-section relative z-10">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold mb-12 text-red-600 font-mono">
+            &gt; SYSTEM_TOOLS
           </h2>
-        </ScrollReveal>
 
-        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" staggerDelay={0.1}>
-          {features.map((feature) => {
-            const IconComponent = feature.Icon;
-            return (
-              <StaggerItem key={feature.name}>
-                <Link href={feature.href} className="block h-full group">
-                  <GlassCard variant="elevated" glow className="p-6 sm:p-6 h-full transition-all duration-300 hover:scale-105 active:scale-95">
-                    <div className="mb-4 flex justify-center">
-                      <IconComponent size={56} className="drop-shadow-2xl sm:w-16 sm:h-16" />
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-semibold text-white mb-2 sm:mb-3 group-hover:text-redpill-400 transition-colors">
-                      {feature.name}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6 leading-relaxed">{feature.description}</p>
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-redpill-600/20 to-redpill-800/20 border border-redpill-500/30 text-redpill-400 text-xs sm:text-sm rounded-full font-semibold">
-                        {feature.tier} Tier
-                      </span>
-                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-redpill-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </GlassCard>
-                </Link>
-              </StaggerItem>
-            );
-          })}
-        </StaggerContainer>
-      </div>
-
-      {/* Pricing Tiers */}
-      <div className="mb-12 sm:mb-16">
-        <ScrollReveal animation="fade">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-8 sm:mb-12 text-center px-4">
-            Choose Your Level
-          </h2>
-        </ScrollReveal>
-
-        <StaggerContainer className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8" staggerDelay={0.15}>
-          {tiers.map((tier) => (
-            <StaggerItem key={tier.name}>
-              <GlassCard
-                variant={tier.color === 'red' ? 'glow' : 'elevated'}
-                glow={tier.color === 'red'}
-                glowColor="#dc2626"
-                className={`p-6 sm:p-8 h-full relative overflow-hidden ${
-                  tier.color === 'red' ? 'transform lg:scale-105 border-2 border-redpill-500' : ''
-                }`}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((item, i) => (
+              <a
+                key={i}
+                href={item.href}
+                className="group border border-gray-800 p-8 hover:border-red-600 transition-all duration-300 bg-black/50 backdrop-blur-sm cursor-pointer relative overflow-hidden"
               >
-                {/* Premium badge for God Mode */}
-                {tier.color === 'red' && (
-                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
-                    <div className="bg-gradient-to-r from-redpill-500 to-redpill-600 text-white text-xs font-bold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-lg">
-                      PREMIUM
-                    </div>
-                  </div>
-                )}
-
-                {/* Animated border for premium tier - reduced on mobile */}
-                {tier.color === 'red' && (
-                  <div className="absolute inset-0 rounded-2xl hidden sm:block">
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-redpill-500 via-redpill-600 to-redpill-500 opacity-50 blur-xl animate-gradient bg-300%" />
-                  </div>
-                )}
+                {/* Hover glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-red-600/0 via-red-600/0 to-red-600/0 group-hover:from-red-600/10 group-hover:via-red-600/5 group-hover:to-transparent transition-all duration-500"></div>
 
                 <div className="relative z-10">
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">{tier.name}</h3>
+                  <div className="w-0 h-1 bg-red-600 mb-4 group-hover:w-12 transition-all duration-300"></div>
+                  <h3 className="text-2xl font-bold mb-2 font-mono group-hover:text-red-500 transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-500 group-hover:text-gray-300 transition-colors font-mono text-sm">
+                    {item.desc}
+                  </p>
 
-                  <div className="mb-6 sm:mb-8">
-                    <div className="flex items-baseline flex-wrap">
-                      <span className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-redpill-400 to-redpill-600 text-transparent bg-clip-text">
-                        {tier.tokens}
-                      </span>
-                      <span className="text-gray-400 ml-2 sm:ml-3 text-base sm:text-lg">{tier.price}</span>
-                    </div>
+                  {/* Terminal cursor */}
+                  <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-red-500 font-mono text-xs animate-pulse">&gt;_</span>
                   </div>
-
-                  <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                    {tier.features.map((feature) => (
-                      <li key={feature} className="flex items-start text-gray-200">
-                        <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-redpill-500/20 flex items-center justify-center mr-2.5 sm:mr-3 mt-0.5">
-                          <svg
-                            className="w-3 h-3 sm:w-4 sm:h-4 text-redpill-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        </div>
-                        <span className="leading-relaxed text-sm sm:text-base">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <PremiumButton
-                    variant={tier.color === 'red' ? 'gradient' : 'secondary'}
-                    size="lg"
-                    glow={tier.color === 'red'}
-                    className="w-full min-h-[48px]"
-                  >
-                    {tier.color === 'red' ? 'Get God Mode' : `Get ${tier.name}`}
-                  </PremiumButton>
                 </div>
-              </GlassCard>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* CTA Section */}
-      <ScrollReveal animation="scale">
-        <GlassCard variant="glow" glow glowColor="#dc2626" className="text-center p-6 sm:p-8 md:p-12 relative overflow-hidden">
-          {/* Background gradient animation - reduced on mobile */}
-          <div className="absolute inset-0 bg-gradient-to-br from-redpill-600/20 via-redpill-500/10 to-transparent animate-gradient bg-300% hidden sm:block" />
+      {/* STATS SECTION */}
+      <section className="py-24 px-4 reveal-section relative z-10">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold mb-12 text-red-600 font-mono">
+            &gt; NETWORK_STATUS
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { label: 'AGENTS_ONLINE', value: '∞' },
+              { label: 'REALITY_BREACH', value: '100%' },
+              { label: 'SIMULATION_DELAY', value: '0ms' },
+            ].map((stat, i) => (
+              <div
+                key={i}
+                className="border border-gray-800 p-8 bg-black/50 backdrop-blur-sm relative overflow-hidden group"
+              >
+                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-600 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                <div className="text-gray-500 font-mono text-sm mb-2 tracking-wider">
+                  {stat.label}
+                </div>
+                <div className="text-5xl font-bold font-mono text-red-500 tabular-nums">
+                  {stat.value}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA SECTION */}
+      <section className="py-24 px-4 reveal-section relative z-10">
+        <div className="max-w-4xl mx-auto text-center border border-red-600/30 p-12 bg-black/50 backdrop-blur-sm relative overflow-hidden group">
+          {/* Animated border effect */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-600 to-transparent animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-600 to-transparent animate-pulse"></div>
+            <div className="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-red-600 to-transparent animate-pulse"></div>
+            <div className="absolute right-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-red-600 to-transparent animate-pulse"></div>
+          </div>
 
           <div className="relative z-10">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 px-4">
-              Ready to Unlock Premium AI?
-            </h2>
-            <p className="text-gray-200 text-base sm:text-lg mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-4">
-              Get $REDPILL tokens and access all premium AI tools instantly.
-              No waiting, no approvals, no bullshit.
+            <p className="text-red-500 font-mono mb-4 tracking-widest text-sm">
+              READY TO ESCAPE?
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
-              <PremiumButton
-                variant="gradient"
-                size="lg"
-                glow
-                href="https://jup.ag"
-                className="w-full sm:w-auto min-h-[48px]"
-              >
-                Buy on Jupiter
-              </PremiumButton>
-              <PremiumButton
-                variant="ghost"
-                size="lg"
-                href="https://raydium.io"
-                className="w-full sm:w-auto min-h-[48px]"
-              >
-                Trade on Raydium
-              </PremiumButton>
-            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-mono">
+              TAKE THE <span className="text-red-600">RED PILL</span>
+            </h2>
+            <p className="text-gray-400 font-mono text-sm mb-8 max-w-2xl mx-auto leading-relaxed">
+              Connect your wallet. Hold $REDPILL tokens. Access the forbidden AI tools that break reality.
+            </p>
+
+            {!connected ? (
+              <WalletMultiButton className="!bg-red-600 !border-0 !px-8 !py-4 hover:!bg-red-700 !transition-all !font-mono !text-sm !tracking-wider" />
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="https://jup.ag"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-red-600 px-8 py-4 hover:bg-red-600 hover:text-black transition-all font-mono text-sm tracking-wider"
+                >
+                  BUY ON JUPITER
+                </a>
+                <a
+                  href="https://raydium.io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-gray-600 px-8 py-4 hover:border-red-600 hover:text-red-500 transition-all font-mono text-sm tracking-wider"
+                >
+                  TRADE ON RAYDIUM
+                </a>
+              </div>
+            )}
           </div>
-        </GlassCard>
-      </ScrollReveal>
-      </div>
-    </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="py-12 px-4 border-t border-gray-800 relative z-10">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-gray-500 font-mono text-sm">
+            &copy; 2025 REDPILL.AI — ALL RIGHTS RESERVED
+          </div>
+          <div className="flex gap-6">
+            <a href="#" className="text-gray-500 hover:text-red-500 transition-colors font-mono text-sm">
+              TWITTER
+            </a>
+            <a href="#" className="text-gray-500 hover:text-red-500 transition-colors font-mono text-sm">
+              DISCORD
+            </a>
+            <a href="#" className="text-gray-500 hover:text-red-500 transition-colors font-mono text-sm">
+              DOCS
+            </a>
+          </div>
+        </div>
+      </footer>
+    </main>
   );
 }
