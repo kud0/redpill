@@ -326,6 +326,46 @@
   }
 }
 
+/* Hero text glow pulse animation */
+@keyframes text-glow-pulse {
+  0%, 100% {
+    text-shadow:
+      0 0 20px rgba(220, 38, 38, 0.5),
+      0 0 40px rgba(220, 38, 38, 0.3),
+      0 0 60px rgba(220, 38, 38, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 0 30px rgba(220, 38, 38, 0.8),
+      0 0 60px rgba(220, 38, 38, 0.5),
+      0 0 90px rgba(220, 38, 38, 0.3);
+  }
+}
+
+/* Chromatic aberration effect */
+@keyframes chromatic-aberration {
+  0%, 100% {
+    text-shadow:
+      -2px -2px 0px rgba(220, 38, 38, 0.7),
+      2px 2px 0px rgba(38, 38, 220, 0.3);
+  }
+  50% {
+    text-shadow:
+      2px -2px 0px rgba(220, 38, 38, 0.7),
+      -2px 2px 0px rgba(38, 38, 220, 0.3);
+  }
+}
+
+/* Letter spacing breathing animation */
+@keyframes letter-breathe {
+  0%, 100% {
+    letter-spacing: -0.05em;
+  }
+  50% {
+    letter-spacing: 0em;
+  }
+}
+
 /* Ambient depth animations - simplified on mobile */
 @keyframes ambient-drift-1 {
   0%, 100% {

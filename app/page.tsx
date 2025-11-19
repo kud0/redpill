@@ -100,10 +100,15 @@ export default function Home() {
           </ScrollReveal>
 
           <ScrollReveal animation="fade" delay={0.2} duration={0.8}>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-              Take the{' '}
-              <span className="bg-gradient-to-r from-redpill-400 via-redpill-500 to-redpill-600 text-transparent bg-clip-text animate-gradient bg-300%">
-                Red Pill
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 leading-tight tracking-tight">
+              <span className="inline-block text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.5)] hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.8)] transition-all duration-300">
+                Take the
+              </span>{' '}
+              <span className="inline-block relative">
+                <span className="absolute inset-0 blur-2xl bg-gradient-to-r from-redpill-400 via-redpill-500 to-redpill-600 opacity-50 animate-pulse" />
+                <span className="relative bg-gradient-to-r from-redpill-400 via-redpill-500 to-redpill-600 text-transparent bg-clip-text animate-gradient bg-300% drop-shadow-[0_0_30px_rgba(220,38,38,0.8)] font-black tracking-tighter">
+                  Red Pill
+                </span>
               </span>
             </h1>
           </ScrollReveal>
