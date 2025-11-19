@@ -2,18 +2,37 @@ import Together from 'together-ai';
 import Anthropic from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
 
-// Initialize AI clients
-const together = new Together({
-  apiKey: process.env.TOGETHER_API_KEY,
-});
+// Lazy initialization of AI clients
+let together: Together | null = null;
+let anthropic: Anthropic | null = null;
+let groq: Groq | null = null;
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+function getTogether() {
+  if (!together) {
+    together = new Together({
+      apiKey: process.env.TOGETHER_API_KEY,
+    });
+  }
+  return together;
+}
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+function getAnthropic() {
+  if (!anthropic) {
+    anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
+  }
+  return anthropic;
+}
+
+function getGroq() {
+  if (!groq) {
+    groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
+  }
+  return groq;
+}
 
 /**
  * Generate an image using Together AI (Flux.1 Pro or SD3 Medium)
@@ -32,7 +51,7 @@ export async function generateImage(
       ? 'black-forest-labs/FLUX.1-pro'
       : 'stabilityai/stable-diffusion-3-medium';
 
-    const response = await together.images.create({
+    const response = await getTogether().images.create({
       model: modelName,
       prompt,
       width: options.width || 1024,
@@ -104,7 +123,7 @@ Requirements:
 Return ONLY the thread posts, one per line, numbered.`;
 
   try {
-    const message = await anthropic.messages.create({
+    const message = await getAnthropic().messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2000,
       messages: [
@@ -155,7 +174,7 @@ export async function generateText(
       content: prompt,
     });
 
-    const response = await groq.chat.completions.create({
+    const response = await getGroq().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: messages as any,
       temperature: 0.7,
