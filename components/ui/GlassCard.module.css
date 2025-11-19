@@ -1,9 +1,16 @@
 .card {
   position: relative;
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 1rem;
   overflow: hidden;
   transition: all 0.3s ease;
+}
+
+/* Mobile optimizations */
+@media (min-width: 640px) {
+  .card {
+    padding: 2rem;
+  }
 }
 
 /* Variants */
@@ -46,20 +53,38 @@
   border: 2px solid rgba(220, 38, 38, 0.5);
 }
 
-/* Blur levels */
+/* Blur levels - reduced on mobile for performance */
 .sm {
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
 }
 
 .md {
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
 }
 
 .lg {
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+/* Stronger blur on desktop */
+@media (min-width: 768px) {
+  .sm {
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+  }
+
+  .md {
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+  }
+
+  .lg {
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  }
 }
 
 /* Fallback for browsers without backdrop-filter */

@@ -16,8 +16,14 @@ const sizeMap = {
   sm: { width: 32, height: 32, fontSize: '0.875rem' },
   md: { width: 64, height: 64, fontSize: '1.5rem' },
   lg: { width: 128, height: 128, fontSize: '3rem' },
-  xl: { width: 200, height: 200, fontSize: '4.5rem' },
+  // Smaller on mobile for better fit
+  xl: { width: 160, height: 160, fontSize: '3.5rem' },
 };
+
+// Use media query to scale up on desktop
+if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+  sizeMap.xl = { width: 200, height: 200, fontSize: '4.5rem' };
+}
 
 /**
  * RedPill Logo Component
