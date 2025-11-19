@@ -1,22 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import dynamic from 'next/dynamic';
+import HeroScene from '@/components/HeroScene';
 import GlitchText from '@/components/GlitchText';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Dynamically import HeroScene to prevent SSR issues
-const HeroScene = dynamic(() => import('@/components/HeroScene'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-[80vh] w-full flex items-center justify-center">
-      <div className="text-red-500 font-mono animate-pulse">LOADING...</div>
-    </div>
-  ),
-});
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
