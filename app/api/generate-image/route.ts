@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hasAccess } from '@/lib/helius';
 import { generateImage } from '@/lib/ai-providers';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimitDb, logActivity, saveGeneratedContent, isUserBanned, getOrCreateUser } from '@/lib/supabase';
 import { isValidSolanaAddress } from '@/lib/solana';
 
 export async function POST(request: NextRequest) {
@@ -23,12 +23,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check rate limit
-    const rateLimit = checkRateLimit(wallet);
+    // Ensure user exists in database
+    await getOrCreateUser(wallet);
+
+    // Check if user is banned
+    const banned = await isUserBanned(wallet);
+    if (banned) {
+      return NextResponse.json(
+        { error: 'Your account has been suspended' },
+        { status: 403 }
+      );
+    }
+
+    // Check rate limit (using database)
+    const rateLimit = await checkRateLimitDb(wallet);
     if (!rateLimit.allowed) {
       const resetIn = Math.ceil((rateLimit.resetAt - Date.now()) / 60000);
       return NextResponse.json(
-        { error: `Rate limit exceeded. Try again in ${resetIn} minutes.` },
+        { error: `Rate limit exceeded. Try again in ${resetIn} minutes.`, remaining: 0, resetAt: rateLimit.resetAt },
         { status: 429 }
       );
     }
@@ -53,9 +65,40 @@ export async function POST(request: NextRequest) {
     // Generate image
     const imageUrl = await generateImage(prompt, model);
 
-    return NextResponse.json({ imageUrl });
+    // Log activity and save content
+    await Promise.all([
+      logActivity({
+        walletAddress: wallet,
+        actionType: 'image_generation',
+        actionDetails: { prompt, model },
+        modelUsed: model,
+        success: true,
+      }),
+      saveGeneratedContent({
+        walletAddress: wallet,
+        contentType: 'image',
+        prompt,
+        resultUrl: imageUrl,
+        modelUsed: model,
+        generationParams: { model },
+      }),
+    ]);
+
+    return NextResponse.json({ imageUrl, remaining: rateLimit.remaining });
   } catch (error: any) {
     console.error('Image generation error:', error);
+
+    // Log failed attempt
+    const wallet = (await request.json().catch(() => ({})))?.wallet;
+    if (wallet && isValidSolanaAddress(wallet)) {
+      await logActivity({
+        walletAddress: wallet,
+        actionType: 'image_generation',
+        success: false,
+        errorMessage: error.message,
+      }).catch(() => {});
+    }
+
     return NextResponse.json(
       { error: error.message || 'Failed to generate image' },
       { status: 500 }

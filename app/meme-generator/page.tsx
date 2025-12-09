@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { toast } from 'sonner';
-import Image from 'next/image';
+// Next.js Image not used for dynamic meme generation
 
 const memeTemplates = [
   'Drake Hotline Bling',

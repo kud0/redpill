@@ -1,9 +1,9 @@
 'use client';
 
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { TierLevel, UserTier } from '@/lib/types';
+import { UserTier } from '@/lib/types';
 import TierBadge from './tier-badge';
 import { formatTokenBalance } from '@/lib/solana';
 
@@ -12,7 +12,7 @@ export default function BalanceChecker() {
   const [tier, setTier] = useState<UserTier | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const checkBalance = async () => {
+  const checkBalance = useCallback(async () => {
     if (!publicKey) return;
 
     setLoading(true);
@@ -41,7 +41,7 @@ export default function BalanceChecker() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [publicKey]);
 
   useEffect(() => {
     if (connected && publicKey) {
@@ -49,7 +49,7 @@ export default function BalanceChecker() {
     } else {
       setTier(null);
     }
-  }, [connected, publicKey]);
+  }, [connected, publicKey, checkBalance]);
 
   if (!connected) {
     return null;

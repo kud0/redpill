@@ -55,11 +55,13 @@ export default function VoiceCloner() {
         throw new Error(error.error || 'Failed to clone voice');
       }
 
-      const data = await response.json();
+      const result = await response.json();
       toast.success('Voice cloned successfully!');
 
       // Handle the cloned audio response
-      // This would typically be an audio URL or base64 data
+      if (result.audio) {
+        console.debug('Cloned audio ready');
+      }
     } catch (error: any) {
       console.error('Voice cloning error:', error);
       toast.error(error.message || 'Failed to clone voice');

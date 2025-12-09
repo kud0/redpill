@@ -28,6 +28,12 @@ interface HeliusBalanceResponse {
  * Checks the $REDPILL token balance for a given wallet address
  */
 export async function checkTokenBalance(walletAddress: string): Promise<number> {
+  // 🔓 BYPASS MODE: Return max balance for testing
+  if (process.env.BYPASS_ACCESS_CHECKS === 'true') {
+    console.log('⚠️ TOKEN BALANCE CHECK BYPASSED - Returning GOD tier balance (999,999 tokens)');
+    return 999999; // GOD tier balance
+  }
+
   if (!HELIUS_API_KEY) {
     throw new Error('HELIUS_API_KEY is not configured');
   }
@@ -112,6 +118,13 @@ export async function hasAccess(
   walletAddress: string,
   requiredTier: TierLevel
 ): Promise<boolean> {
+  // 🔓 BYPASS MODE: For testing/development without token holdings
+  // Set BYPASS_ACCESS_CHECKS=true in .env.local to disable token checks
+  if (process.env.BYPASS_ACCESS_CHECKS === 'true') {
+    console.log('⚠️ ACCESS CHECKS BYPASSED - Testing mode enabled');
+    return true;
+  }
+
   const balance = await checkTokenBalance(walletAddress);
   const userTier = getUserTier(balance);
 

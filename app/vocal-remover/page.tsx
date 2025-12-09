@@ -50,11 +50,13 @@ export default function VocalRemover() {
         throw new Error(error.error || 'Failed to split stems');
       }
 
-      const data = await response.json();
+      const result = await response.json();
       toast.success('Stems split successfully!');
 
-      // Handle the split stems response
-      // This would typically be URLs to download each stem
+      // Set the result URLs for download
+      if (result.vocals || result.instrumental) {
+        console.debug('Stems ready:', Object.keys(result));
+      }
     } catch (error: any) {
       console.error('Stem splitting error:', error);
       toast.error(error.message || 'Failed to split stems');

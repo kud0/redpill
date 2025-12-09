@@ -12,6 +12,39 @@ export default function ThreadWriter() {
   const [length, setLength] = useState(5);
   const [thread, setThread] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
+
+  // Check access on mount and when wallet connects
+  const checkAccess = async () => {
+    if (!publicKey) {
+      setHasAccess(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/check-balance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet: publicKey.toString() }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Allow access if user has basic tier or higher
+        setHasAccess(['basic', 'full', 'god'].includes(data.level));
+      } else {
+        setHasAccess(false);
+      }
+    } catch (error) {
+      console.error('Access check error:', error);
+      setHasAccess(false);
+    }
+  };
+
+  // Check access when wallet connects
+  if (connected && publicKey && !hasAccess && !loading) {
+    checkAccess();
+  }
 
   const writeThread = async () => {
     if (!connected || !publicKey) {
@@ -147,6 +180,7 @@ export default function ThreadWriter() {
                 onClick={writeThread}
                 disabled={loading || !connected}
                 className="w-full px-6 py-4 bg-redpill-600 hover:bg-redpill-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed redpill-glow"
+                title={!connected ? 'Connect your wallet first' : !hasAccess ? 'Checking access...' : ''}
               >
                 {loading ? (
                   <span className="flex items-center justify-center">

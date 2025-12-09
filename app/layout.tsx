@@ -1,14 +1,23 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Space_Mono, Orbitron } from 'next/font/google';
 import './globals.css';
 import Providers from '@/components/providers';
 
-const inter = Inter({ subsets: ['latin'] });
+const spaceMono = Space_Mono({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-space-mono',
+});
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  variable: '--font-orbitron',
+});
 
 export const metadata: Metadata = {
-  title: 'RedPill AI - Premium AI Tools for $REDPILL Holders',
-  description: 'Hold $REDPILL tokens to unlock unlimited access to premium AI tools: image generation, meme creation, thread writing, voice cloning, and more.',
-  keywords: ['crypto', 'AI', 'Solana', 'token', 'meme generator', 'image generation'],
+  title: 'RedPill AI - Break The Simulation',
+  description: 'Hold $REDPILL tokens to unlock forbidden AI tools. Join the resistance.',
+  keywords: ['crypto', 'AI', 'Solana', 'token', 'redpill', 'matrix', 'artificial intelligence'],
 };
 
 export default function RootLayout({
@@ -18,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>
+      <body className={`${spaceMono.variable} ${orbitron.variable} font-mono bg-matrix-black text-white selection:bg-neon-red selection:text-black overflow-x-hidden`}>
         <Providers>
           {children}
         </Providers>

@@ -2,6 +2,14 @@ import { Bot, InlineKeyboard, Context } from 'grammy';
 import { checkTokenBalance, getTierInfo } from '../lib/helius';
 import { generateImage, generateMeme, writeThread } from '../lib/ai-providers';
 import { isValidSolanaAddress } from '../lib/solana';
+import {
+  getUserByTelegramId,
+  linkTelegramUser,
+  logActivity,
+  checkRateLimitDb,
+  getOrCreateUser,
+  getUserStats,
+} from '../lib/supabase';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -11,12 +19,10 @@ if (!BOT_TOKEN) {
 
 const bot = new Bot(BOT_TOKEN);
 
-// In-memory wallet storage (use database in production)
-const userWallets = new Map<number, string>();
-
-// Helper to check if user has linked wallet
-function getUserWallet(userId: number): string | null {
-  return userWallets.get(userId) || null;
+// Helper to get user wallet from database
+async function getUserWallet(userId: number): Promise<string | null> {
+  const user = await getUserByTelegramId(userId);
+  return user?.wallet_address || null;
 }
 
 // Start command
@@ -58,7 +64,7 @@ bot.callbackQuery('link_wallet', async (ctx) => {
     { parse_mode: 'Markdown' }
   );
 
-  // Set conversation state (in production, use proper state management)
+  // Set conversation state
   ctx.session = { awaitingWallet: true };
 });
 
@@ -66,7 +72,7 @@ bot.callbackQuery('link_wallet', async (ctx) => {
 bot.callbackQuery('check_balance', async (ctx) => {
   await ctx.answerCallbackQuery();
 
-  const wallet = getUserWallet(ctx.from.id);
+  const wallet = await getUserWallet(ctx.from.id);
   if (!wallet) {
     await ctx.reply('Please link your wallet first using /start');
     return;
@@ -75,6 +81,7 @@ bot.callbackQuery('check_balance', async (ctx) => {
   try {
     const balance = await checkTokenBalance(wallet);
     const tierInfo = getTierInfo(balance);
+    const stats = await getUserStats(wallet);
 
     const tierEmoji = {
       none: '❌',
@@ -89,9 +96,20 @@ bot.callbackQuery('check_balance', async (ctx) => {
       `Balance: *${balance.toLocaleString()} $REDPILL*\n\n` +
       `${tierEmoji[tierInfo.level]} Tier: *${tierInfo.level.toUpperCase()}*\n\n` +
       `*Available Features:*\n` +
-      tierInfo.features.map(f => `• ${f}`).join('\n'),
+      tierInfo.features.map(f => `• ${f}`).join('\n') +
+      `\n\n📊 *Your Stats:*\n` +
+      `• Images: ${stats.imagesGenerated}\n` +
+      `• Memes: ${stats.memesGenerated}\n` +
+      `• Threads: ${stats.threadsWritten}`,
       { parse_mode: 'Markdown' }
     );
+
+    // Log balance check
+    await logActivity({
+      walletAddress: wallet,
+      actionType: 'balance_check',
+      actionDetails: { balance, tier: tierInfo.level },
+    });
   } catch (error) {
     await ctx.reply('Failed to check balance. Please try again.');
   }
@@ -101,16 +119,25 @@ bot.callbackQuery('check_balance', async (ctx) => {
 bot.callbackQuery('image_generator', async (ctx) => {
   await ctx.answerCallbackQuery();
 
-  const wallet = getUserWallet(ctx.from.id);
+  const wallet = await getUserWallet(ctx.from.id);
   if (!wallet) {
     await ctx.reply('Please link your wallet first using /start');
     return;
   }
 
+  // Check rate limit
+  const rateLimit = await checkRateLimitDb(wallet);
+  if (!rateLimit.allowed) {
+    const resetIn = Math.ceil((rateLimit.resetAt - Date.now()) / 60000);
+    await ctx.reply(`⏳ Rate limit exceeded. Try again in ${resetIn} minutes.`);
+    return;
+  }
+
   await ctx.reply(
-    '🎨 *Image Generator*\n\n' +
-    'Send me a detailed prompt to generate an image.\n\n' +
-    'Example: "A futuristic city at sunset with flying cars"',
+    `🎨 *Image Generator*\n\n` +
+    `Send me a detailed prompt to generate an image.\n\n` +
+    `Example: "A futuristic city at sunset with flying cars"\n\n` +
+    `_Requests remaining: ${rateLimit.remaining}_`,
     { parse_mode: 'Markdown' }
   );
 
@@ -122,9 +149,17 @@ bot.callbackQuery('image_generator', async (ctx) => {
 bot.callbackQuery('meme_generator', async (ctx) => {
   await ctx.answerCallbackQuery();
 
-  const wallet = getUserWallet(ctx.from.id);
+  const wallet = await getUserWallet(ctx.from.id);
   if (!wallet) {
     await ctx.reply('Please link your wallet first using /start');
+    return;
+  }
+
+  // Check rate limit
+  const rateLimit = await checkRateLimitDb(wallet);
+  if (!rateLimit.allowed) {
+    const resetIn = Math.ceil((rateLimit.resetAt - Date.now()) / 60000);
+    await ctx.reply(`⏳ Rate limit exceeded. Try again in ${resetIn} minutes.`);
     return;
   }
 
@@ -136,8 +171,9 @@ bot.callbackQuery('meme_generator', async (ctx) => {
     .text('Pepe', 'meme_pepe');
 
   await ctx.reply(
-    '🎭 *Meme Generator*\n\n' +
-    'Choose a meme template:',
+    `🎭 *Meme Generator*\n\n` +
+    `Choose a meme template:\n\n` +
+    `_Requests remaining: ${rateLimit.remaining}_`,
     {
       parse_mode: 'Markdown',
       reply_markup: keyboard,
@@ -149,16 +185,25 @@ bot.callbackQuery('meme_generator', async (ctx) => {
 bot.callbackQuery('thread_writer', async (ctx) => {
   await ctx.answerCallbackQuery();
 
-  const wallet = getUserWallet(ctx.from.id);
+  const wallet = await getUserWallet(ctx.from.id);
   if (!wallet) {
     await ctx.reply('Please link your wallet first using /start');
     return;
   }
 
+  // Check rate limit
+  const rateLimit = await checkRateLimitDb(wallet);
+  if (!rateLimit.allowed) {
+    const resetIn = Math.ceil((rateLimit.resetAt - Date.now()) / 60000);
+    await ctx.reply(`⏳ Rate limit exceeded. Try again in ${resetIn} minutes.`);
+    return;
+  }
+
   await ctx.reply(
-    '✍️ *Thread Writer*\n\n' +
-    'Send me a topic to write a thread about.\n\n' +
-    'Example: "The future of AI in crypto"',
+    `✍️ *Thread Writer*\n\n` +
+    `Send me a topic to write a thread about.\n\n` +
+    `Example: "The future of AI in crypto"\n\n` +
+    `_Requests remaining: ${rateLimit.remaining}_`,
     { parse_mode: 'Markdown' }
   );
 
@@ -173,13 +218,27 @@ bot.on('message:text', async (ctx) => {
   // Check if awaiting wallet address
   if (ctx.session?.awaitingWallet) {
     if (isValidSolanaAddress(text)) {
-      userWallets.set(ctx.from.id, text);
-      await ctx.reply(
-        `✅ Wallet linked successfully!\n\n` +
-        `Address: \`${text.slice(0, 4)}...${text.slice(-4)}\`\n\n` +
-        `Use the menu to access features.`,
-        { parse_mode: 'Markdown' }
-      );
+      try {
+        // Link wallet in database
+        await linkTelegramUser(text, ctx.from.id, ctx.from.username);
+
+        // Log the wallet link
+        await logActivity({
+          walletAddress: text,
+          actionType: 'wallet_link',
+          actionDetails: { telegramUserId: ctx.from.id, username: ctx.from.username },
+        });
+
+        await ctx.reply(
+          `✅ Wallet linked successfully!\n\n` +
+          `Address: \`${text.slice(0, 4)}...${text.slice(-4)}\`\n\n` +
+          `Use the menu to access features.`,
+          { parse_mode: 'Markdown' }
+        );
+      } catch (error) {
+        console.error('Failed to link wallet:', error);
+        await ctx.reply('Failed to link wallet. Please try again.');
+      }
       ctx.session = {};
     } else {
       await ctx.reply('Invalid Solana address. Please try again.');
@@ -189,7 +248,7 @@ bot.on('message:text', async (ctx) => {
 
   // Check if awaiting image prompt
   if (ctx.session?.awaitingImagePrompt) {
-    const wallet = getUserWallet(ctx.from.id);
+    const wallet = await getUserWallet(ctx.from.id);
     if (!wallet) return;
 
     await ctx.reply('🎨 Generating image... This may take a minute.');
@@ -199,8 +258,22 @@ bot.on('message:text', async (ctx) => {
       await ctx.replyWithPhoto(imageUrl, {
         caption: `✨ Generated: "${text}"`,
       });
+
+      // Log successful generation
+      await logActivity({
+        walletAddress: wallet,
+        actionType: 'image_generation',
+        actionDetails: { prompt: text, model: 'sd3-medium', source: 'telegram' },
+        success: true,
+      });
     } catch (error) {
       await ctx.reply('Failed to generate image. Please check your tier and try again.');
+      await logActivity({
+        walletAddress: wallet,
+        actionType: 'image_generation',
+        success: false,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
 
     ctx.session = {};
@@ -209,7 +282,7 @@ bot.on('message:text', async (ctx) => {
 
   // Check if awaiting thread topic
   if (ctx.session?.awaitingThreadTopic) {
-    const wallet = getUserWallet(ctx.from.id);
+    const wallet = await getUserWallet(ctx.from.id);
     if (!wallet) return;
 
     await ctx.reply('✍️ Writing thread... This may take a moment.');
@@ -222,8 +295,22 @@ bot.on('message:text', async (ctx) => {
         `✨ *Thread Generated*\n\n${threadText}`,
         { parse_mode: 'Markdown' }
       );
+
+      // Log successful generation
+      await logActivity({
+        walletAddress: wallet,
+        actionType: 'thread_writing',
+        actionDetails: { topic: text, platform: 'x', source: 'telegram', postCount: thread.length },
+        success: true,
+      });
     } catch (error) {
       await ctx.reply('Failed to write thread. Please check your tier and try again.');
+      await logActivity({
+        walletAddress: wallet,
+        actionType: 'thread_writing',
+        success: false,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
 
     ctx.session = {};
