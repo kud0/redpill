@@ -612,6 +612,25 @@ export async function getUserStats(walletAddress: string): Promise<{
 }
 
 // ============================================
+// Admin client export for profit sharing
+// ============================================
+
+// Export admin client directly for simpler usage
+export const supabaseAdmin = (() => {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    // Return a dummy object in development if not configured
+    console.warn('Supabase not configured - profit sharing disabled');
+    return null as any;
+  }
+  return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+})();
+
+// ============================================
 // Health Check
 // ============================================
 

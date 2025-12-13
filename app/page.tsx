@@ -60,7 +60,7 @@ export default function Home() {
 
           <div className="max-w-6xl mx-auto px-4">
             <h3 className="text-neon-red font-mono text-xs tracking-[0.3em] mb-12 text-center uppercase opacity-70">
-                // Global_Network_Parameters
+                {"// Global_Network_Parameters"}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
               {[

@@ -1,9 +1,10 @@
 import { TierLevel, TIER_CONFIGS, UserTier } from './types';
 
 const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
-const REDPILL_TOKEN_ADDRESS = process.env.REDPILL_TOKEN_ADDRESS;
+const REDPILL_TOKEN_ADDRESS = process.env.REDPILL_TOKEN_ADDRESS || process.env.NEXT_PUBLIC_REDPILL_TOKEN_MINT;
+const SOLANA_RPC = process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
 
-interface HeliusBalanceResponse {
+interface TokenBalanceResponse {
   result: {
     value: Array<{
       account: {
@@ -26,6 +27,7 @@ interface HeliusBalanceResponse {
 
 /**
  * Checks the $REDPILL token balance for a given wallet address
+ * Uses Helius if configured, otherwise falls back to public Solana RPC
  */
 export async function checkTokenBalance(walletAddress: string): Promise<number> {
   // 🔓 BYPASS MODE: Return max balance for testing
@@ -34,16 +36,17 @@ export async function checkTokenBalance(walletAddress: string): Promise<number> 
     return 999999; // GOD tier balance
   }
 
-  if (!HELIUS_API_KEY) {
-    throw new Error('HELIUS_API_KEY is not configured');
-  }
-
   if (!REDPILL_TOKEN_ADDRESS) {
     throw new Error('REDPILL_TOKEN_ADDRESS is not configured');
   }
 
+  // Determine which RPC to use
+  const rpcUrl = HELIUS_API_KEY
+    ? `https://rpc.helius.xyz/?api-key=${HELIUS_API_KEY}`
+    : SOLANA_RPC;
+
   try {
-    const response = await fetch(`https://rpc.helius.xyz/?api-key=${HELIUS_API_KEY}`, {
+    const response = await fetch(rpcUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,17 +68,17 @@ export async function checkTokenBalance(walletAddress: string): Promise<number> 
     });
 
     if (!response.ok) {
-      throw new Error(`Helius API error: ${response.statusText}`);
+      throw new Error(`RPC error: ${response.statusText}`);
     }
 
-    const data: HeliusBalanceResponse = await response.json();
+    const data: TokenBalanceResponse = await response.json();
 
-    if (!data.result?.value?.length) {
-      return 0;
+    if (data.result?.value?.length) {
+      const tokenAccount = data.result.value[0];
+      return tokenAccount.account.data.parsed.info.tokenAmount.uiAmount || 0;
     }
 
-    const tokenAccount = data.result.value[0];
-    return tokenAccount.account.data.parsed.info.tokenAmount.uiAmount || 0;
+    return 0;
   } catch (error) {
     console.error('Error checking token balance:', error);
     throw new Error('Failed to check token balance');

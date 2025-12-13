@@ -2,7 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import TheRedPill from './TheRedPill';
+import dynamic from 'next/dynamic';
+
+const TheRedPill = dynamic(() => import('./TheRedPill'), {
+    ssr: false,
+    loading: () => <div className="w-full h-full bg-black" />
+});
 import GlitchText from './GlitchText';
 
 export default function Hero() {
@@ -36,7 +41,7 @@ export default function Hero() {
 
             {/* Background Elements */}
             <div className="absolute inset-0 z-0">
-                <TheRedPill />
+                {mounted && <TheRedPill />}
             </div>
 
             {/* Vignette */}
